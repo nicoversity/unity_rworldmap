@@ -13,15 +13,18 @@
 
 library(rworldmap)                      # load rworldmap package
 
-# query map data
+# query map data (as provided by rworldmap package)
 worldMap <- getMap(resolution = "low")
 
+# debug: have a look at all country names included 
+#worldMap$NAME
+
 # create data frame with all countries
-# developer note 2021-02-02: For some reason, the 113 entry is titled NA, and thus not available. Therefore, it is excluded here in order to avoid issues when iterating through the country data.
+# developer note 2021-02-02: For some reason, the 113th entry is titled NA, and thus not available. Therefore, it is excluded here in order to avoid issues when iterating through the country data.
 countryDF <- data.frame(country = worldMap$NAME[! worldMap$NAME %in% c(worldMap$NAME[113])])
 
-# have a look at the data frame in the console
-countryDF
+# hdebug: ave a look at the data frame in the console
+#countryDF
 
 
 # === preparation: C# / Unity3D ===
@@ -53,22 +56,22 @@ for (i in c(1:countriesCount))
     country = as.character(countryDF$country[i])
 
     # normalize country name for use as C# class and variable names
-    countryNormalized <- trimws(country)
-    countryNormalized <- gsub(" ", "", countryNormalized, fixed = TRUE)
-    countryNormalized <- gsub("&", "", countryNormalized, fixed = TRUE)
-    countryNormalized <- gsub(".", "", countryNormalized, fixed = TRUE)
-    countryNormalized <- gsub("'", "", countryNormalized, fixed = TRUE)
-    countryNormalized <- gsub("(", "", countryNormalized, fixed = TRUE)
-    countryNormalized <- gsub(")", "", countryNormalized, fixed = TRUE)
+    countryNormalized <- trimws(country)                                    # trim leading / trailing white spaces
+    countryNormalized <- gsub(" ", "", countryNormalized, fixed = TRUE)     # remove remaining white spaces
+    countryNormalized <- gsub("&", "", countryNormalized, fixed = TRUE)     # remove &
+    countryNormalized <- gsub(".", "", countryNormalized, fixed = TRUE)     # remove .
+    countryNormalized <- gsub("'", "", countryNormalized, fixed = TRUE)     # remove '
+    countryNormalized <- gsub("(", "", countryNormalized, fixed = TRUE)     # remove (
+    countryNormalized <- gsub(")", "", countryNormalized, fixed = TRUE)     # remove )
     
-    # get index for current country
+    # get index for current country iteration
     index <- worldMap$NAME== country
     index[is.na(index)] <- FALSE
     
     # create polygon instance
     P <- worldMap[index,]@polygons
     
-    # init text variable representing vector content for the current country
+    # init text variable representing the vector content for the current country
     vectorText = c()
     
     # iterate through all parts in the country polygon
@@ -78,7 +81,7 @@ for (i in c(1:countriesCount))
         partsCount = n
         partNames = c(partNames, list(sprintf("%s_%i", countryNormalized, n)))
         
-        # append header data
+        # append header data for C# class
         vectorText = c(vectorText, sprintf("public static Vector2 [] %s_%i = new Vector2[] {", countryNormalized, n))
         
         # append vector data
@@ -100,10 +103,10 @@ for (i in c(1:countriesCount))
     # setup class name
     className = sprintf("MeshData%s", countryNormalized)
     
-    # generate initialization entry for current exported country
+    # generate initialization entry for current exported country (in line with initialization function call in Unity WorldGenerator.cs script)
     initText = c(initText, sprintf('initCountryWithMeshData("%s", new %s(), extrusionHeight, countryColor);', countryNormalized, className))
     
-    # create C# file for current country
+    # create C# file for current country, and setup header parts
     fileConn <- file(paste(unityClassesDirectory, sprintf("%s.cs", className), sep=""))
     fileText = c()
     fileText = c(fileText, "using UnityEngine;")
@@ -117,11 +120,11 @@ for (i in c(1:countriesCount))
     fileText = (c(fileText, vectorText))
     fileText = c(fileText, "")
     
-    # create parts count function
+    # create partsCount interface function
     fileText = c(fileText, sprintf("    public int partsCount { get; set; } = %i;", partsCount))
     fileText = c(fileText, "")
     
-    # create get part of index function
+    # create getPartForIndex(int index) interface function
     fileText = c(fileText, "    public Vector2[] getPartForIndex(int index) {")
     fileText = c(fileText, "")
     fileText = c(fileText, "        switch (index)")
@@ -145,6 +148,7 @@ for (i in c(1:countriesCount))
 
 
 # === unity initialization snippet  ===
+
 # write initialization snipped to file
 writeLines(initText, initFileConn)
 close(initFileConn) 

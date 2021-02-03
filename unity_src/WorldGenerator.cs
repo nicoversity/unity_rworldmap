@@ -33,7 +33,6 @@ public class WorldGenerator : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        //initCountryWithMeshData("Sweden", new MeshDataSweden(), sweden, extrusionHeight, colorWithHex("ffffb3"));
         Color32 countryColor = colorWithHex("ffffff");
 
         // === INSERT HERE CONTENTS OF _init.cs SCRIPT AS GENERATED IN R ===
@@ -43,8 +42,6 @@ public class WorldGenerator : MonoBehaviour
 
 
     #region COUNTRY_INITIALIZATION
-
-    //private bool initCountryWithMeshData(string name, MeshDataSweden meshData, float height, Color32 color)
 
     /// <summary>
     /// Function to initialize countries as GameObjects wth PolyExtruder components attached.
@@ -69,8 +66,12 @@ public class WorldGenerator : MonoBehaviour
             currentPart.transform.parent = countryGO.transform;
             PolyExtruder polyExt = currentPart.AddComponent<PolyExtruder>();                                // make sure to import the "Unity - PolyExtruder" package to your project: https://github.com/nicoversity/unity_polyextruder
             polyExt.createPrism(currentPart.name, height, meshData.getPartForIndex(i), color, true);
+
+            // Developer note: For further manipulation of the created PolyExtruder components at run-time, it might be a good idea to keep track of the created PolyExtruder components, e.g., by storing references into an ArrayList or Dictionary.
+            // By keeping track of the PolyExtruder components this way, these manipulation operations and properties can be accessed and triggered more conveniently, without the need of requesting each PolyExtruder components of the individual GameObjects.
         }
 
+        // return statement
         return true;
     }
 

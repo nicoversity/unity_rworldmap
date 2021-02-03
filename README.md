@@ -11,7 +11,8 @@ The purpose of this project is to illustrate the workflow of exporting vector da
 ## Features
 
 * R script required to access and generate all `Vector2` country data from the *rworldmap* package.
-* Unity3D script to visualize all country data as individual `GameObjects`.
+* Generation of C# classes that implement the provided `IRWMMeshData.cs` interface.
+* Unity3D script to visualize all country data as individual `GameObjects`, integrated using [Unity - PolyExtruder](https://github.com/nicoversity/unity_polyextruder).
 * comprehensive documentation across all source files
 
 ## Dependencies
@@ -50,7 +51,7 @@ All source code can be found within the `unity_src` directory of this repository
 4. In your Unity scene, create a new empty GameObject (make sure its properties are `reset`), and attach the imported `WorldGenerator.cs` script as a component.
 5. Import all generated mesh data files from your `rworldmap-unity-files` directory to your project (except for the `_init.cs` script).
 6. Open the `WorldGenerator.cs` script, and copy all contents of the `_init.cs` script to the marked location inside the `Awake()` function.
-7. Run your Unity3D application. All created country GameObjects are attached as Child GameObjects to the GameObject that has the `WorldGenerator.cs` as a component attached.
+7. Run your Unity3D application. All created country GameObjects are attached as Child GameObjects to the GameObject that has the `WorldGenerator.cs` as a component attached (see step 4).
 8. For further configuration of the extruded country polygons, please refer to the [Unity - PolyExtruder](https://github.com/nicoversity/unity_polyextruder) documentation.
 
 ## Screenshots

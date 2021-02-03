@@ -18,6 +18,6 @@ using UnityEngine;
 
 public interface IRWMMeshData 
 {
-    int partsCount { get; set; }
-    Vector2[] getPartForIndex(int index);
+    int partsCount { get; set; }				// count representing the amount of individual polygons representing the country's Mesh Data
+    Vector2[] getPartForIndex(int index);		// function to retrieve a reference to a specific part of the individual polygons representing the country's Mesh Data
 }
